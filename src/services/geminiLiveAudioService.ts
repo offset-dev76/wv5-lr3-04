@@ -211,7 +211,7 @@ const functionDeclarations = [
   },
   {
     name: "add_item_to_order",
-    description: "Add a menu item to the current order",
+    description: "Add a NEW menu item to the current order. Only use this for items NOT already in the order.",
     parameters: {
       type: Type.OBJECT,
       properties: {
@@ -243,7 +243,7 @@ const functionDeclarations = [
   },
   {
     name: "update_item_quantity",
-    description: "Update the quantity of an item in the order",
+    description: "Update/change the quantity of an existing item already in the order. Use this when user wants to modify quantity (e.g., 'change to 1', 'make it 3', 'reduce to 2').",
     parameters: {
       type: Type.OBJECT,
       properties: {
@@ -253,7 +253,7 @@ const functionDeclarations = [
         },
         quantity: {
           type: Type.NUMBER,
-          description: "New quantity for the item"
+          description: "New quantity for the item (will replace current quantity)"
         }
       },
       required: ["itemName", "quantity"]
@@ -383,7 +383,7 @@ export class GeminiLiveAudioService {
       await this.inputAudioContext.resume();
       await this.outputAudioContext.resume();
 
-      const model = 'gemini-2.5-flash-preview-native-audio-dialog';
+      const model = 'gemini-2.5-flash-live-preview';
 
       this.session = await this.client.live.connect({
         model: model,

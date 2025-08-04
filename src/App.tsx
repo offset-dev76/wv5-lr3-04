@@ -14,6 +14,7 @@ import BlogDetail from "./pages/BlogDetail";
 import References from "./pages/References";
 import Booking from "./pages/Booking";
 import NotFound from "./pages/NotFound";
+import AIOrb from "./components/AIOrb";
 
 const queryClient = new QueryClient();
 
@@ -55,6 +56,11 @@ const App = () => (
             <Route path="/references" element={<References />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
+          
+          {/* Global AI Orb - persists across all pages */}
+          <div className="fixed top-6 right-6 z-50">
+            <AIOrb />
+          </div>
         </main>
       </BrowserRouter>
     </TooltipProvider>

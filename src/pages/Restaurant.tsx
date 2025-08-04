@@ -3,7 +3,6 @@ import { Clock, Minus, Plus, ShoppingCart } from "lucide-react";
 import { useRestaurantNavigation } from "@/hooks/useRestaurantNavigation";
 import NavigationBar from "@/components/NavigationBar";
 import WeatherWidget from "@/components/WeatherWidget";
-import AIOrb from "@/components/AIOrb";
 import WeatherBackground from "@/components/WeatherBackground";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -223,9 +222,6 @@ const Restaurant = () => {
           
           {/* Weather Widget */}
           <WeatherWidget onWeatherChange={setWeatherCondition} />
-          
-          {/* AI Orb */}
-          <AIOrb focused={navigation.currentSection === 'ai-button'} />
         </div>
       </header>
 

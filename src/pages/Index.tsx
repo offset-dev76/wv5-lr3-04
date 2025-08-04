@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import TVCarousel from "@/components/TVCarousel";
 import TVAppCard from "@/components/TVAppCard";
 import MovieCard from "@/components/MovieCard";
-import AIOrb from "@/components/AIOrb";
 import WeatherWidget from "@/components/WeatherWidget";
 import WeatherBackground from "@/components/WeatherBackground";
 import NavigationBar from "@/components/NavigationBar";
@@ -115,12 +114,6 @@ const Index = () => {
           
           {/* Weather Widget */}
           <WeatherWidget onWeatherChange={setWeatherCondition} />
-          
-          {/* AI Orb */}
-          <AIOrb 
-            focused={navigation.currentSection === 'ai-button'} 
-            onClick={() => console.log('AI activated')}
-          />
         </div>
       </header>
 

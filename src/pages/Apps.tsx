@@ -3,7 +3,6 @@ import TVAppCard from "@/components/TVAppCard";
 import { useKeyboardNavigation } from "@/hooks/useKeyboardNavigation";
 import NavigationBar from "@/components/NavigationBar";
 import WeatherWidget from "@/components/WeatherWidget";
-import AIOrb from "@/components/AIOrb";
 import WeatherBackground from "@/components/WeatherBackground";
 
 // Import images
@@ -73,9 +72,6 @@ const Apps = () => {
           
           {/* Weather Widget */}
           <WeatherWidget onWeatherChange={setWeatherCondition} />
-          
-          {/* AI Orb */}
-          <AIOrb focused={navigation.currentSection === 'ai-button'} />
         </div>
       </header>
 
