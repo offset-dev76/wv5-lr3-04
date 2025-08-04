@@ -396,11 +396,23 @@ export class GeminiLiveAudioService {
           onmessage: async (message: LiveServerMessage) => {
             console.log('Received message from Gemini:', message);
             
-            // Handle function calls
+            // Handle function calls - check multiple possible locations
             if (message.toolCall) {
-              console.log('Function call received:', message.toolCall);
+              console.log('Function call received in toolCall:', message.toolCall);
               await this.handleFunctionCall(message.toolCall);
               return;
+            }
+            
+            // Also check serverContent for tool calls
+            if (message.serverContent?.modelTurn?.parts) {
+              for (const part of message.serverContent.modelTurn.parts) {
+                if (part.functionCall) {
+                  console.log('Function call received in serverContent:', part.functionCall);
+                  const toolCall = { functionCalls: [part.functionCall] };
+                  await this.handleFunctionCall(toolCall);
+                  return;
+                }
+              }
             }
 
             // Handle audio response
