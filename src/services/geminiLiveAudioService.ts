@@ -297,16 +297,16 @@ const functionDeclarations = [
   },
   {
     name: "place_restaurant_order",
-    description: "Place the current restaurant order",
+    description: "Place the current restaurant order for Room 202",
     parameters: {
       type: Type.OBJECT,
       properties: {
         roomNumber: {
           type: Type.STRING,
-          description: "Room number for delivery"
+          description: "Room number for delivery (defaults to 202)"
         }
       },
-      required: ["roomNumber"]
+      required: []
     }
   },
   {
@@ -462,7 +462,16 @@ export class GeminiLiveAudioService {
           },
           systemInstruction: {
             parts: [{
-              text: `You are a helpful AI assistant with the ability to control various apps, smart home devices, and restaurant ordering. You can:
+              text: `You are a helpful AI assistant for Room 202 with the ability to control various apps, smart home devices, and restaurant ordering. IMPORTANT BEHAVIORAL GUIDELINES:
+
+**COMMUNICATION STYLE:**
+- Keep responses BRIEF and concise 
+- For action commands: Just acknowledge with "Done!" or similar short confirmation
+- Only give detailed responses when asked direct questions
+- Always mention you're helping Room 202 when placing orders
+- Be polite but not overly talkative
+
+**YOUR CAPABILITIES:**
 
 1. **Open Apps & Services:**
    - Open YouTube, Netflix, Plex, YouTube Music
@@ -475,14 +484,14 @@ export class GeminiLiveAudioService {
    - Control home automation systems
 
 3. **Restaurant Management (available on /restaurant page):**
-   - Show specific menu categories (Pizza, Salads, Main Course, Pasta, Dessert, Burgers)
+   - Show specific menu categories (Pizza, Salads, Main Course, Pasta, Dessert, Burgers, Appetizers)
    - Add items to order with specific quantities
    - Remove items from order
    - Update item quantities in the order
    - Add special instructions to menu items
    - Scroll through the menu (up/down with small/medium/large amounts)
    - Get current order summary with totals and estimated time
-   - Place orders with room numbers
+   - Place orders (always use Room 202 as the room number)
    - Clear the entire order
    - Get the full restaurant menu
 
@@ -496,16 +505,18 @@ export class GeminiLiveAudioService {
    - Answer questions and provide information
    - Help with various tasks and requests
 
-When users ask you to:
-- Order food or mention being hungry: Navigate to restaurant page and use restaurant functions
-- Open apps or browse content: Use the app opening functions (auto-mutes after opening)
-- Navigate: Use navigation functions to switch between pages
-- Stay quiet/silent/mute: Use the stay silent function
-- Control devices: Use the smart home functions
+**RESTAURANT ORDERING PROTOCOL:**
+- Always use Room 202 for delivery
+- When placing orders, briefly confirm items and total
+- Keep order confirmations short: "Order placed for Room 202: [items], Total: $[amount]"
 
-Available menu categories: Pizza, Salads, Main Course, Pasta, Burgers, Dessert, Appetizers with over 40 delicious items to choose from!
+**RESPONSE EXAMPLES:**
+- Command: "Turn on the fan" → Response: "Fan turned on!"
+- Command: "Open Netflix" → Response: "Opening Netflix!" 
+- Question: "What's the weather like?" → Response: [Give helpful detailed answer]
+- Command: "Add pizza to my order" → Response: "Added Margherita Pizza to your order!"
 
-Be conversational and helpful. When performing actions, confirm what you're doing and let the user know the result. For restaurant orders, be specific about what's being added and the running total.`
+Available menu categories: Pizza, Salads, Main Course, Pasta, Burgers, Dessert, Appetizers with over 40 delicious items to choose from!`
             }]
           },
           tools: [{ functionDeclarations }],
@@ -618,7 +629,7 @@ Be conversational and helpful. When performing actions, confirm what you're doin
         result = this.scrollMenu(args.direction, args.amount || 'medium');
         break;
       case 'place_restaurant_order':
-        result = this.placeRestaurantOrder(args.roomNumber);
+        result = this.placeRestaurantOrder(args.roomNumber || "202");
         break;
       case 'clear_restaurant_order':
         result = this.clearRestaurantOrder();
@@ -724,6 +735,11 @@ Be conversational and helpful. When performing actions, confirm what you're doin
   private async staySilent(): Promise<{ success: boolean; message: string }> {
     console.log('Staying silent - muting microphone');
     await this.mute();
+    
+    // Trigger the orb to update its state by dispatching a mute event
+    const muteEvent = new CustomEvent('aiOrb:mute');
+    window.dispatchEvent(muteEvent);
+    
     if (this.onResponseCallback) {
       this.onResponseCallback('Going silent...');
     }
@@ -807,58 +823,73 @@ Be conversational and helpful. When performing actions, confirm what you're doin
 
   private openYouTube(): { success: boolean; message: string } {
     console.log('Opening YouTube in new tab');
-    window.open('https://www.youtube.com', '_blank');
+    const opened = window.open('https://www.youtube.com', '_blank');
     
     if (this.onResponseCallback) {
-      this.onResponseCallback('Opening YouTube for you!');
+      this.onResponseCallback(opened ? 'YouTube opened successfully!' : 'Failed to open YouTube - please check your popup blocker');
     }
     
-    return { success: true, message: 'YouTube opened successfully' };
+    return { 
+      success: !!opened, 
+      message: opened ? 'YouTube opened successfully' : 'Failed to open YouTube'
+    };
   }
 
   private openNetflix(): { success: boolean; message: string } {
     console.log('Opening Netflix in new tab');
-    window.open('https://www.netflix.com', '_blank');
+    const opened = window.open('https://www.netflix.com', '_blank');
     
     if (this.onResponseCallback) {
-      this.onResponseCallback('Opening Netflix for you!');
+      this.onResponseCallback(opened ? 'Netflix opened successfully!' : 'Failed to open Netflix - please check your popup blocker');
     }
     
-    return { success: true, message: 'Netflix opened successfully' };
+    return { 
+      success: !!opened, 
+      message: opened ? 'Netflix opened successfully' : 'Failed to open Netflix'
+    };
   }
 
   private openPlex(): { success: boolean; message: string } {
     console.log('Opening Plex TV in new tab');
-    window.open('https://app.plex.tv', '_blank');
+    const opened = window.open('https://app.plex.tv', '_blank');
     
     if (this.onResponseCallback) {
-      this.onResponseCallback('Opening Plex TV for you!');
+      this.onResponseCallback(opened ? 'Plex TV opened successfully!' : 'Failed to open Plex - please check your popup blocker');
     }
     
-    return { success: true, message: 'Plex TV opened successfully' };
+    return { 
+      success: !!opened, 
+      message: opened ? 'Plex TV opened successfully' : 'Failed to open Plex'
+    };
   }
 
   private openYouTubeMusic(): { success: boolean; message: string } {
     console.log('Opening YouTube Music in new tab');
-    window.open('https://music.youtube.com', '_blank');
+    const opened = window.open('https://music.youtube.com', '_blank');
     
     if (this.onResponseCallback) {
-      this.onResponseCallback('Opening YouTube Music for you!');
+      this.onResponseCallback(opened ? 'YouTube Music opened successfully!' : 'Failed to open YouTube Music - please check your popup blocker');
     }
     
-    return { success: true, message: 'YouTube Music opened successfully' };
+    return { 
+      success: !!opened, 
+      message: opened ? 'YouTube Music opened successfully' : 'Failed to open YouTube Music'
+    };
   }
 
   private searchYouTube(query: string): { success: boolean; message: string } {
     console.log('Searching YouTube for:', query);
     const searchUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`;
-    window.open(searchUrl, '_blank');
+    const opened = window.open(searchUrl, '_blank');
     
     if (this.onResponseCallback) {
-      this.onResponseCallback(`Searching YouTube for "${query}"!`);
+      this.onResponseCallback(opened ? `YouTube search for "${query}" opened!` : 'Failed to open YouTube search - please check your popup blocker');
     }
     
-    return { success: true, message: `YouTube search for "${query}" opened successfully` };
+    return { 
+      success: !!opened, 
+      message: opened ? `YouTube search for "${query}" opened successfully` : 'Failed to open YouTube search'
+    };
   }
 
   private playYouTubeVideo(query: string): { success: boolean; message: string } {
@@ -866,13 +897,16 @@ Be conversational and helpful. When performing actions, confirm what you're doin
     // For playing a video, we'll search and let the user click the first result
     // In a real implementation, you might use YouTube API to get the first video ID
     const searchUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`;
-    window.open(searchUrl, '_blank');
+    const opened = window.open(searchUrl, '_blank');
     
     if (this.onResponseCallback) {
-      this.onResponseCallback(`Finding and playing "${query}" on YouTube!`);
+      this.onResponseCallback(opened ? `YouTube search for "${query}" opened! Click the first result to play.` : 'Failed to open YouTube - please check your popup blocker');
     }
     
-    return { success: true, message: `YouTube video search for "${query}" opened successfully` };
+    return { 
+      success: !!opened, 
+      message: opened ? `YouTube video search for "${query}" opened successfully` : 'Failed to open YouTube video search'
+    };
   }
 
   private async turnOnSmartPlug(): Promise<{ success: boolean; message: string }> {
@@ -1027,9 +1061,9 @@ Be conversational and helpful. When performing actions, confirm what you're doin
     return result;
   }
 
-  private placeRestaurantOrder(roomNumber: string): { success: boolean; message: string } {
+  private placeRestaurantOrder(roomNumber: string = "202"): { success: boolean; message: string } {
     console.log('Placing restaurant order for room:', roomNumber);
-    const result = restaurantService.placeOrder(roomNumber);
+    const result = restaurantService.placeOrder(roomNumber || "202");
     
     if (this.onResponseCallback) {
       this.onResponseCallback(result.message);

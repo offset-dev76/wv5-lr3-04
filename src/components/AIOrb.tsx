@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Mic, MicOff, Volume2 } from 'lucide-react';
 import { useGeminiLiveAudio } from '@/hooks/useGeminiLiveAudio';
 
@@ -13,10 +13,23 @@ const AIOrb: React.FC<AIOrbProps> = ({ focused = false, onClick }) => {
     isConnected, 
     isMuted, 
     toggleMute, 
+    mute,
     connect, 
     disconnect, 
     audioLevel 
   } = useGeminiLiveAudio();
+
+  // Listen for mute events from Gemini service
+  useEffect(() => {
+    const handleMuteEvent = () => {
+      mute();
+    };
+
+    window.addEventListener('aiOrb:mute', handleMuteEvent);
+    return () => {
+      window.removeEventListener('aiOrb:mute', handleMuteEvent);
+    };
+  }, [mute]);
 
   const handleClick = async () => {
     onClick?.();

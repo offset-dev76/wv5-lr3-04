@@ -484,10 +484,18 @@ class RestaurantService {
     menuItems.forEach(menuElement => {
       const nameElement = menuElement.querySelector('h3');
       if (nameElement && nameElement.textContent?.includes(item.name)) {
-        // Click the item multiple times for quantity
-        for (let i = 0; i < quantity; i++) {
-          (menuElement as HTMLElement).click();
-        }
+        // Scroll to the item first to ensure it's visible
+        menuElement.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center'
+        });
+        
+        // Wait a moment, then click the item multiple times for quantity
+        setTimeout(() => {
+          for (let i = 0; i < quantity; i++) {
+            (menuElement as HTMLElement).click();
+          }
+        }, 300);
         itemClicked = true;
       }
     });
@@ -515,7 +523,7 @@ class RestaurantService {
     }
 
     // Find the item in the menu and repeatedly click minus button
-    const menuItems = document.querySelectorAll('#menu-items-container > div');
+    const menuItems = document.querySelectorAll('#menu-items-container .cursor-pointer');
     let itemFound = false;
 
     menuItems.forEach(menuElement => {
