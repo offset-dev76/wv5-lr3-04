@@ -112,9 +112,7 @@ const WeatherWidget: React.FC<WeatherWidgetProps> = ({
         <span className="text-lg font-medium text-white py-0">
           {weather.temperature}°C
         </span>
-        <span className="text-xs text-gray-400 capitalize">
-          {weather.description}
-        </span>
+        
       </div>
     </div>;
 };
