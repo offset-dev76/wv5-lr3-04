@@ -176,9 +176,10 @@ export const useKeyboardNavigation = (
         case 'Enter':
           event.preventDefault();
           if (currentSection === 'nav') {
-            // Trigger navigation click
-            const navElement = document.querySelector(`#navigation-bar button:nth-child(${focusedIndex + 1})`) as HTMLElement;
-            if (navElement) navElement.click();
+            // Trigger navigation click in UnifiedHeader
+            const headerButtons = document.querySelectorAll('.bg-black\\/30 button, .bg-black\\/30 .cursor-pointer');
+            const targetButton = headerButtons[focusedIndex] as HTMLElement;
+            if (targetButton) targetButton.click();
           } else if (currentSection === 'ai-button') {
             // Trigger AI button click
             const aiButton = document.getElementById('ai-orb-button');

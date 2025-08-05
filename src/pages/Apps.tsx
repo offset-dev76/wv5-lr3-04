@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import TVAppCard from "@/components/TVAppCard";
 import { useKeyboardNavigation } from "@/hooks/useKeyboardNavigation";
-import NavigationBar from "@/components/NavigationBar";
-import WeatherWidget from "@/components/WeatherWidget";
+import UnifiedHeader from "@/components/UnifiedHeader";
 import WeatherBackground from "@/components/WeatherBackground";
 
 // Import images
@@ -13,28 +12,11 @@ import youtubeMusicIcon from "@/assets/youtube-music-icon.jpg";
 import plexIcon from "@/assets/plex-icon.jpg";
 
 const Apps = () => {
-  const [currentTime, setCurrentTime] = useState("");
   const [weatherCondition, setWeatherCondition] = useState<'sunny' | 'cloudy' | 'rainy' | 'stormy' | 'snowy'>('sunny');
 
   // Scroll to top on page load
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, []);
-
-  // Update time every second
-  useEffect(() => {
-    const updateTime = () => {
-      const now = new Date();
-      setCurrentTime(now.toLocaleTimeString([], {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true
-      }));
-    };
-
-    updateTime();
-    const interval = setInterval(updateTime, 1000);
-    return () => clearInterval(interval);
   }, []);
 
   const streamingApps = [
@@ -50,29 +32,20 @@ const Apps = () => {
   ];
 
   // Initialize keyboard navigation
-  const navigation = useKeyboardNavigation(streamingApps.length, 0, 0, 0, 4); // 4 nav items including AI button
+  const navigation = useKeyboardNavigation(streamingApps.length, 0, 0, 0, 5); // 5 nav items (nav + time + weather)
 
   return (
     <div className="min-h-screen bg-black text-white relative">
       {/* Weather Background Animations */}
       <WeatherBackground condition={weatherCondition} />
       
-      {/* Header */}
-      <header className="flex items-center justify-between p-6 md:p-8 relative z-10">
-        <NavigationBar 
-          focused={navigation.currentSection === 'nav'} 
-          focusedIndex={navigation.focusedIndex} 
+      {/* Unified Header */}
+      <header>
+        <UnifiedHeader 
+          focused={navigation.currentSection === 'nav'}
+          focusedIndex={navigation.focusedIndex}
+          onWeatherChange={setWeatherCondition}
         />
-        
-        <div className="flex items-center space-x-6">
-          {/* Time Widget */}
-          <div className="flex items-center text-gray-300">
-            <span className="text-lg font-semibold text-white">{currentTime}</span>
-          </div>
-          
-          {/* Weather Widget */}
-          <WeatherWidget onWeatherChange={setWeatherCondition} />
-        </div>
       </header>
 
       <div className="p-6 md:p-8">

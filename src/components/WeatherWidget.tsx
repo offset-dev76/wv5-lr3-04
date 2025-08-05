@@ -80,7 +80,7 @@ const WeatherWidget: React.FC<WeatherWidgetProps> = ({
   const getWeatherIcon = (condition: WeatherData['condition']) => {
     const iconProps = {
       size: 24,
-      className: "text-psyco-green-DEFAULT"
+      className: "text-psyco-green-DEFAULT drop-shadow-[0_0_8px_rgba(34,197,94,0.6)]"
     };
     switch (condition) {
       case 'sunny':

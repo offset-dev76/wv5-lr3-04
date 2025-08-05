@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Clock, Minus, Plus, ShoppingCart } from "lucide-react";
 import { useRestaurantNavigation } from "@/hooks/useRestaurantNavigation";
-import NavigationBar from "@/components/NavigationBar";
-import WeatherWidget from "@/components/WeatherWidget";
+import UnifiedHeader from "@/components/UnifiedHeader";
 import WeatherBackground from "@/components/WeatherBackground";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -36,7 +35,6 @@ interface OrderItem extends MenuItem {
 }
 
 const Restaurant = () => {
-  const [currentTime, setCurrentTime] = useState("");
   const [weatherCondition, setWeatherCondition] = useState<'sunny' | 'cloudy' | 'rainy' | 'stormy' | 'snowy'>('sunny');
   const [selectedCategory, setSelectedCategory] = useState("Pizza");
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
@@ -46,22 +44,6 @@ const Restaurant = () => {
   // Scroll to top on page load
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, []);
-
-  // Update time every second
-  useEffect(() => {
-    const updateTime = () => {
-      const now = new Date();
-      setCurrentTime(now.toLocaleTimeString([], {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true
-      }));
-    };
-
-    updateTime();
-    const interval = setInterval(updateTime, 1000);
-    return () => clearInterval(interval);
   }, []);
 
   const menuItems: MenuItem[] = [
@@ -207,22 +189,13 @@ const Restaurant = () => {
       {/* Weather Background Animations */}
       <WeatherBackground condition={weatherCondition} />
       
-      {/* Header */}
-      <header className="flex items-center justify-between p-6 md:p-8 relative z-10 border-b border-gray-800">
-        <NavigationBar 
-          focused={navigation.currentSection === 'nav'} 
-          focusedIndex={navigation.focusedIndex} 
+      {/* Unified Header */}
+      <header>
+        <UnifiedHeader 
+          focused={navigation.currentSection === 'nav'}
+          focusedIndex={navigation.focusedIndex}
+          onWeatherChange={setWeatherCondition}
         />
-        
-        <div className="flex items-center space-x-6">
-          {/* Time Widget */}
-          <div className="flex items-center text-gray-300">
-            <span className="text-lg font-semibold text-white">{currentTime}</span>
-          </div>
-          
-          {/* Weather Widget */}
-          <WeatherWidget onWeatherChange={setWeatherCondition} />
-        </div>
       </header>
 
       {/* Main Content - 3 Column Layout */}
