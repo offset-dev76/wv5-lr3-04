@@ -17,10 +17,23 @@ export const useKeyboardNavigation = (
 ) => {
   const { isFocused: isAIFocused, setFocused: setAIFocused } = useAIOrbFocus();
   
-  const [navigation, setNavigation] = useState<NavigationState>({
-    currentSection: isAIFocused ? 'ai-button' : 'carousel',
-    focusedIndex: 0,
-  });
+  // Get initial state from session storage for focus persistence
+  const getInitialState = (): NavigationState => {
+    const storedSection = sessionStorage.getItem('last-focused-section') as FocusSection;
+    const storedIndex = parseInt(sessionStorage.getItem('last-focused-index') || '0');
+    
+    if (isAIFocused) {
+      return { currentSection: 'ai-button', focusedIndex: 0 };
+    }
+    
+    if (storedSection && ['nav', 'ai-button'].includes(storedSection)) {
+      return { currentSection: storedSection, focusedIndex: storedIndex };
+    }
+    
+    return { currentSection: 'carousel', focusedIndex: 0 };
+  };
+  
+  const [navigation, setNavigation] = useState<NavigationState>(getInitialState());
 
   const scrollToSection = useCallback((section: FocusSection) => {
     if (section === 'nav') {
@@ -62,16 +75,28 @@ export const useKeyboardNavigation = (
   const handleKeyPress = useCallback((event: KeyboardEvent) => {
     setNavigation((prevNavigation) => {
       const { currentSection, focusedIndex } = prevNavigation;
+      
+      // Store current focus state for persistence
+      const storeCurrentState = (section: FocusSection, index: number) => {
+        if (['nav', 'ai-button'].includes(section)) {
+          sessionStorage.setItem('last-focused-section', section);
+          sessionStorage.setItem('last-focused-index', index.toString());
+        }
+      };
 
       switch (event.key) {
         case 'ArrowDown':
           event.preventDefault();
           if (currentSection === 'nav') {
             scrollToSection('carousel');
-            return { currentSection: 'carousel', focusedIndex: 0 };
+            const newState = { currentSection: 'carousel' as FocusSection, focusedIndex: 0 };
+            storeCurrentState(newState.currentSection, newState.focusedIndex);
+            return newState;
           } else if (currentSection === 'ai-button') {
             scrollToSection('nav');
-            return { currentSection: 'nav', focusedIndex: 0 };
+            const newState = { currentSection: 'nav' as FocusSection, focusedIndex: 0 };
+            storeCurrentState(newState.currentSection, newState.focusedIndex);
+            return newState;
           } else if (currentSection === 'carousel') {
             scrollToSection('apps');
             return { currentSection: 'apps', focusedIndex: 0 };
@@ -88,7 +113,9 @@ export const useKeyboardNavigation = (
           event.preventDefault();
           if (currentSection === 'carousel') {
             scrollToSection('nav');
-            return { currentSection: 'nav', focusedIndex: 0 };
+            const newState = { currentSection: 'nav' as FocusSection, focusedIndex: 0 };
+            storeCurrentState(newState.currentSection, newState.focusedIndex);
+            return newState;
           } else if (currentSection === 'apps') {
             scrollToSection('carousel');
             return { currentSection: 'carousel', focusedIndex: 0 };
@@ -106,14 +133,15 @@ export const useKeyboardNavigation = (
           if (currentSection === 'ai-button') {
             // Navigate back to last nav item from AI button
             setAIFocused(false);
-            return { currentSection: 'nav', focusedIndex: navItemsCount - 1 };
+            const newState = { currentSection: 'nav' as FocusSection, focusedIndex: navItemsCount - 1 };
+            storeCurrentState(newState.currentSection, newState.focusedIndex);
+            return newState;
           } else if (currentSection === 'nav' && focusedIndex > 0) {
-            return { currentSection, focusedIndex: focusedIndex - 1 };
+            const newState = { currentSection, focusedIndex: focusedIndex - 1 };
+            storeCurrentState(newState.currentSection, newState.focusedIndex);
+            return newState;
           } else if (currentSection === 'carousel' && focusedIndex > 0) {
             const newIndex = focusedIndex - 1;
-            // Trigger carousel navigation
-            const prevButton = document.querySelector('[data-carousel-prev]') as HTMLButtonElement;
-            if (prevButton) prevButton.click();
             return { currentSection, focusedIndex: newIndex };
           } else if (currentSection === 'apps' && focusedIndex > 0) {
             const newIndex = focusedIndex - 1;
@@ -142,16 +170,17 @@ export const useKeyboardNavigation = (
         case 'ArrowRight':
           event.preventDefault();
           if (currentSection === 'nav' && focusedIndex < navItemsCount - 1) {
-            return { currentSection, focusedIndex: focusedIndex + 1 };
+            const newState = { currentSection, focusedIndex: focusedIndex + 1 };
+            storeCurrentState(newState.currentSection, newState.focusedIndex);
+            return newState;
           } else if (currentSection === 'nav' && focusedIndex === navItemsCount - 1) {
             // Navigate to AI button after last nav item (weather is last in nav)
             setAIFocused(true);
-            return { currentSection: 'ai-button', focusedIndex: 0 };
+            const newState = { currentSection: 'ai-button' as FocusSection, focusedIndex: 0 };
+            storeCurrentState(newState.currentSection, newState.focusedIndex);
+            return newState;
           } else if (currentSection === 'carousel' && focusedIndex < carouselItemsCount - 1) {
             const newIndex = focusedIndex + 1;
-            // Trigger carousel navigation
-            const nextButton = document.querySelector('[data-carousel-next]') as HTMLButtonElement;
-            if (nextButton) nextButton.click();
             return { currentSection, focusedIndex: newIndex };
           } else if (currentSection === 'apps' && focusedIndex < streamingAppsCount - 1) {
             const newIndex = focusedIndex + 1;

@@ -85,22 +85,20 @@ const TVCarousel: React.FC = () => {
     };
   }, [api]);
 
-  return <Carousel className="w-full opacity-92 focus-within:opacity-100 transition-opacity duration-300" setApi={setApi}>
+  return <Carousel className="w-full" setApi={setApi}>
       <CarouselContent>
         {carouselItems.map(item => <CarouselItem key={item.id}>
             <Card className="relative overflow-hidden border-none bg-transparent">
               <div className="relative h-[500px] w-full">
-                {/* Background image with fade effect */}
+                {/* Background image */}
                 <img 
                   src={item.image} 
                   alt={item.title} 
-                  className="w-full h-full object-cover opacity-0 animate-fade-in"
-                  style={{ animationDuration: '1s', animationFillMode: 'forwards' }}
+                  className="w-full h-full object-cover"
                 />
                 
-                {/* Gradient overlay - also fades with image */}
-                <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent opacity-0 animate-fade-in" 
-                     style={{ animationDuration: '1s', animationFillMode: 'forwards' }} />
+                {/* Gradient overlay */}
+                <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent" />
                 
                 {/* Content - always 100% opacity */}
                 <div className="absolute bottom-0 left-0 p-8 text-white max-w-lg opacity-100">

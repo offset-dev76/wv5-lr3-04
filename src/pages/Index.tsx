@@ -109,9 +109,7 @@ const Index = () => {
       {/* Hero Carousel Section */}
       <section 
         id="section-carousel" 
-        className={`relative mb-12 transition-opacity duration-300 ${
-          navigation.currentSection === 'carousel' ? 'opacity-100' : 'opacity-92'
-        }`}
+        className="relative mb-12"
       >
         <div className="w-full">
           <TVCarousel />

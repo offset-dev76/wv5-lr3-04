@@ -118,7 +118,10 @@ const AIOrb: React.FC<AIOrbProps> = ({ focused = false, onClick }) => {
       
       {/* Glow effect when focused */}
       {isOrbFocused && (
-        <div className="absolute inset-0 rounded-full bg-white/20 animate-pulse" />
+        <>
+          <div className="absolute -inset-2 rounded-full bg-white/30 animate-pulse" />
+          <div className="absolute -inset-1 rounded-full border-2 border-white/60 animate-pulse" />
+        </>
       )}
     </button>
   );

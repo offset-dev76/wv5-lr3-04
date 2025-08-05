@@ -88,7 +88,7 @@ const UnifiedHeader: React.FC<UnifiedHeaderProps> = ({
           if (item.type === 'nav') {
             return <button key={item.path} onClick={() => handleNavClick(item.path)} className={`
                     h-10 text-sm font-medium transition-all duration-300 rounded-full px-4 flex items-center whitespace-nowrap
-                    ${isActive ? 'bg-white text-black shadow-lg' : isFocused ? 'bg-white text-black' : 'text-gray-300 hover:text-white hover:bg-white/10'}
+                    ${isActive ? 'bg-white text-black shadow-lg' : isFocused ? 'bg-gray-600 text-white shadow-lg' : 'text-gray-300 hover:text-white hover:bg-white/10'}
                   `}>
                   {item.name}
                 </button>;
