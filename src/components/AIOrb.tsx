@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Mic, MicOff, Volume2 } from 'lucide-react';
 import { useGeminiLiveAudio } from '@/hooks/useGeminiLiveAudio';
+import { useAIOrbFocus } from '@/hooks/useAIOrbFocus';
 
 interface AIOrbProps {
   focused?: boolean;
@@ -18,6 +19,8 @@ const AIOrb: React.FC<AIOrbProps> = ({ focused = false, onClick }) => {
     disconnect, 
     audioLevel 
   } = useGeminiLiveAudio();
+  
+  const { isFocused, setFocused } = useAIOrbFocus();
 
   // Listen for mute events from Gemini service
   useEffect(() => {
@@ -61,12 +64,22 @@ const AIOrb: React.FC<AIOrbProps> = ({ focused = false, onClick }) => {
     return <Volume2 size={20} className="text-white" />;
   };
 
+  // Use focused prop or global focus state
+  const isOrbFocused = focused || isFocused;
+
+  useEffect(() => {
+    // Update global focus state when focused prop changes
+    if (focused !== isFocused) {
+      setFocused(focused);
+    }
+  }, [focused, isFocused, setFocused]);
+
   return (
     <button
       id="ai-orb-button"
       onClick={handleClick}
       className={`relative w-12 h-12 rounded-full transition-all duration-300 cursor-pointer group ${
-        focused ? 'ring-2 ring-white' : ''
+        isOrbFocused ? 'ring-2 ring-white' : ''
       } ${
         orbState === 'active'
           ? 'bg-gradient-to-r from-green-500 to-green-600 scale-110 shadow-lg shadow-green-500/50' 
@@ -104,7 +117,7 @@ const AIOrb: React.FC<AIOrbProps> = ({ focused = false, onClick }) => {
       </div>
       
       {/* Glow effect when focused */}
-      {focused && (
+      {isOrbFocused && (
         <div className="absolute inset-0 rounded-full bg-white/20 animate-pulse" />
       )}
     </button>

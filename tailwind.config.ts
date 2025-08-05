@@ -151,6 +151,9 @@ export default {
 			},
 			backgroundImage: {
 				'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))'
+			},
+			opacity: {
+				'92': '0.92'
 			}
 		}
 	},

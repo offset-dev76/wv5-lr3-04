@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useAIOrbFocus } from './useAIOrbFocus';
 
 export type FocusSection = 'nav' | 'carousel' | 'apps' | 'movies' | 'continue-watching' | 'ai-button' | 'categories' | 'menu-items' | 'order-summary';
 
@@ -14,8 +15,10 @@ export const useKeyboardNavigation = (
   carouselItemsCount: number = 3,
   navItemsCount: number = 3
 ) => {
+  const { isFocused: isAIFocused, setFocused: setAIFocused } = useAIOrbFocus();
+  
   const [navigation, setNavigation] = useState<NavigationState>({
-    currentSection: 'carousel',
+    currentSection: isAIFocused ? 'ai-button' : 'carousel',
     focusedIndex: 0,
   });
 
@@ -102,6 +105,7 @@ export const useKeyboardNavigation = (
           event.preventDefault();
           if (currentSection === 'ai-button') {
             // Navigate back to last nav item from AI button
+            setAIFocused(false);
             return { currentSection: 'nav', focusedIndex: navItemsCount - 1 };
           } else if (currentSection === 'nav' && focusedIndex > 0) {
             return { currentSection, focusedIndex: focusedIndex - 1 };
@@ -140,7 +144,8 @@ export const useKeyboardNavigation = (
           if (currentSection === 'nav' && focusedIndex < navItemsCount - 1) {
             return { currentSection, focusedIndex: focusedIndex + 1 };
           } else if (currentSection === 'nav' && focusedIndex === navItemsCount - 1) {
-            // Navigate to AI button after last nav item
+            // Navigate to AI button after last nav item (weather is last in nav)
+            setAIFocused(true);
             return { currentSection: 'ai-button', focusedIndex: 0 };
           } else if (currentSection === 'carousel' && focusedIndex < carouselItemsCount - 1) {
             const newIndex = focusedIndex + 1;
@@ -181,7 +186,7 @@ export const useKeyboardNavigation = (
             const targetButton = headerButtons[focusedIndex] as HTMLElement;
             if (targetButton) targetButton.click();
           } else if (currentSection === 'ai-button') {
-            // Trigger AI button click
+            // Trigger AI button click (toggle mute/unmute)
             const aiButton = document.getElementById('ai-orb-button');
             if (aiButton) aiButton.click();
           } else if (currentSection === 'apps') {
@@ -193,7 +198,7 @@ export const useKeyboardNavigation = (
       }
       return prevNavigation;
     });
-  }, [streamingAppsCount, moviesCount, continueWatchingCount, carouselItemsCount, navItemsCount, scrollToSection, scrollToFocusedItem]);
+  }, [streamingAppsCount, moviesCount, continueWatchingCount, carouselItemsCount, navItemsCount, scrollToSection, scrollToFocusedItem, setAIFocused]);
 
   useEffect(() => {
     window.addEventListener('keydown', handleKeyPress);

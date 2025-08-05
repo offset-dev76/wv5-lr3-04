@@ -88,6 +88,11 @@ const Index = () => {
     5  // Navigation items count (nav + time + weather)
   );
 
+  // Make navigation available globally for carousel
+  useEffect(() => {
+    (window as any).currentNavigation = navigation;
+  }, [navigation]);
+
   return <div className="min-h-screen bg-black text-white relative">
       {/* Weather Background Animations */}
       <WeatherBackground condition={weatherCondition} />
@@ -102,7 +107,12 @@ const Index = () => {
       </header>
 
       {/* Hero Carousel Section */}
-      <section id="section-carousel" className="relative mb-12">
+      <section 
+        id="section-carousel" 
+        className={`relative mb-12 transition-opacity duration-300 ${
+          navigation.currentSection === 'carousel' ? 'opacity-100' : 'opacity-92'
+        }`}
+      >
         <div className="w-full">
           <TVCarousel />
         </div>

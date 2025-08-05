@@ -37,6 +37,44 @@ const NavigationEventListener = () => {
   return null;
 };
 
+// Global AI state management
+const AIGlobalState = () => {
+  useEffect(() => {
+    // Check if AI was focused before navigation
+    const wasFocused = sessionStorage.getItem('ai-orb-focused') === 'true';
+    
+    if (wasFocused) {
+      // Restore focus to AI orb after page load
+      setTimeout(() => {
+        const aiButton = document.getElementById('ai-orb-button');
+        if (aiButton) {
+          // Trigger focus state in keyboard navigation
+          window.dispatchEvent(new CustomEvent('focus-ai-orb'));
+        }
+      }, 100);
+    }
+
+    // Listen for AI focus changes
+    const handleAIFocus = () => {
+      sessionStorage.setItem('ai-orb-focused', 'true');
+    };
+
+    const handleAIBlur = () => {
+      sessionStorage.setItem('ai-orb-focused', 'false');
+    };
+
+    window.addEventListener('ai-orb-focus', handleAIFocus);
+    window.addEventListener('ai-orb-blur', handleAIBlur);
+    
+    return () => {
+      window.removeEventListener('ai-orb-focus', handleAIFocus);
+      window.removeEventListener('ai-orb-blur', handleAIBlur);
+    };
+  }, []);
+
+  return null;
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -44,6 +82,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <NavigationEventListener />
+        <AIGlobalState />
         <main className="min-h-screen bg-black">
           <Routes>
             <Route path="/" element={<Index />} />

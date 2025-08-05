@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Card } from '@/components/ui/card';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { Play, Info } from 'lucide-react';
+import type { CarouselApi } from '@/components/ui/carousel';
 interface CarouselItem {
   id: number;
   title: string;
@@ -29,15 +30,80 @@ const carouselItems: CarouselItem[] = [{
   category: "Comedy"
 }];
 const TVCarousel: React.FC = () => {
-  return <Carousel className="w-full">
+  const [api, setApi] = React.useState<CarouselApi>();
+  const autoScrollRef = useRef<NodeJS.Timeout>();
+
+  useEffect(() => {
+    if (!api) return;
+
+    // Auto-scroll every 5 seconds
+    const startAutoScroll = () => {
+      autoScrollRef.current = setInterval(() => {
+        api.scrollNext();
+      }, 5000);
+    };
+
+    const stopAutoScroll = () => {
+      if (autoScrollRef.current) {
+        clearInterval(autoScrollRef.current);
+      }
+    };
+
+    // Start auto-scroll
+    startAutoScroll();
+
+    // Listen for manual navigation to restart auto-scroll timer
+    api.on('select', () => {
+      stopAutoScroll();
+      startAutoScroll();
+    });
+
+    // Keyboard navigation support
+    const handleKeyPress = (event: KeyboardEvent) => {
+      // Only handle if carousel section is focused
+      const navigation = (window as any).currentNavigation;
+      if (navigation?.currentSection === 'carousel') {
+        if (event.key === 'ArrowLeft') {
+          event.preventDefault();
+          stopAutoScroll();
+          api.scrollPrev();
+          startAutoScroll();
+        } else if (event.key === 'ArrowRight') {
+          event.preventDefault();
+          stopAutoScroll();
+          api.scrollNext();
+          startAutoScroll();
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+
+    return () => {
+      stopAutoScroll();
+      window.removeEventListener('keydown', handleKeyPress);
+    };
+  }, [api]);
+
+  return <Carousel className="w-full opacity-92 focus-within:opacity-100 transition-opacity duration-300" setApi={setApi}>
       <CarouselContent>
         {carouselItems.map(item => <CarouselItem key={item.id}>
             <Card className="relative overflow-hidden border-none bg-transparent">
               <div className="relative h-[500px] w-full">
-                <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
-                <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent" />
-                <div className="absolute bottom-0 left-0 p-8 text-white max-w-lg">
-                  
+                {/* Background image with fade effect */}
+                <img 
+                  src={item.image} 
+                  alt={item.title} 
+                  className="w-full h-full object-cover opacity-0 animate-fade-in"
+                  style={{ animationDuration: '1s', animationFillMode: 'forwards' }}
+                />
+                
+                {/* Gradient overlay - also fades with image */}
+                <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent opacity-0 animate-fade-in" 
+                     style={{ animationDuration: '1s', animationFillMode: 'forwards' }} />
+                
+                {/* Content - always 100% opacity */}
+                <div className="absolute bottom-0 left-0 p-8 text-white max-w-lg opacity-100">
                   <h2 className="text-5xl md:text-6xl font-black mb-4">{item.title}</h2>
                   <p className="text-gray-300 mb-6 text-lg">{item.description}</p>
                   <div className="flex gap-4">
@@ -56,7 +122,8 @@ const TVCarousel: React.FC = () => {
           </CarouselItem>)}
       </CarouselContent>
       
-      
+      <CarouselPrevious data-carousel-prev />
+      <CarouselNext data-carousel-next />
     </Carousel>;
 };
 export default TVCarousel;

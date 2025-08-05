@@ -220,7 +220,7 @@ const Restaurant = () => {
                   }
                 }}
                 className={`
-                  w-full text-left px-4 py-3 rounded-lg transition-all duration-200
+                  w-full text-left px-4 py-2 rounded-lg transition-all duration-200
                   ${selectedCategory === category 
                     ? 'text-white bg-white/10 font-semibold' 
                     : 'text-gray-400 hover:text-gray-300 hover:bg-gray-900/50'
@@ -251,13 +251,16 @@ const Restaurant = () => {
                   {category}
                 </h3>
                 <div className="space-y-4">
-                  {filteredItems.filter(item => item.category === category).map((item, index) => (
+                  {filteredItems.filter(item => item.category === category).map((item, categoryIndex) => {
+                    // Calculate global index across all categories
+                    const globalIndex = filteredItems.findIndex(globalItem => globalItem.id === item.id);
+                    return (
                     <Card 
                       key={item.id}
-                      id={`menu-item-${index}`}
+                      id={`menu-item-${globalIndex}`}
                       className={`
                         bg-gray-900/50 border-gray-700 hover:border-gray-500 transition-all duration-300 cursor-pointer
-                        ${navigation.currentSection === 'menu-items' && navigation.focusedIndex === index 
+                        ${navigation.currentSection === 'menu-items' && navigation.focusedIndex === globalIndex 
                           ? 'border-white bg-white/10 shadow-lg shadow-white/20' 
                           : ''
                         }
@@ -326,7 +329,8 @@ const Restaurant = () => {
                         </div>
                       </CardContent>
                     </Card>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             ))}
