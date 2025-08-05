@@ -55,14 +55,8 @@ const TVCarousel: React.FC = () => {
             </Card>
           </CarouselItem>)}
       </CarouselContent>
-      <CarouselPrevious 
-        data-carousel-prev
-        className="left-4 bg-black/50 border-white/20 text-white hover:bg-black/70" 
-      />
-      <CarouselNext 
-        data-carousel-next
-        className="right-4 bg-black/50 border-white/20 text-white hover:bg-black/70" 
-      />
+      
+      
     </Carousel>;
 };
 export default TVCarousel;
