@@ -29,13 +29,13 @@ const carouselItems: CarouselItem[] = [{
   category: "Comedy"
 }];
 const TVCarousel: React.FC = () => {
-  return <Carousel className="w-full max-w-7xl mx-auto">
+  return <Carousel className="w-full">
       <CarouselContent>
         {carouselItems.map(item => <CarouselItem key={item.id}>
             <Card className="relative overflow-hidden border-none bg-transparent">
               <div className="relative h-[500px] w-full">
-                <img src={item.image} alt={item.title} className="w-full h-full object-cover rounded-lg" />
-                <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent rounded-lg" />
+                <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
+                <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent" />
                 <div className="absolute bottom-0 left-0 p-8 text-white max-w-lg">
                   
                   <h2 className="text-5xl md:text-6xl font-black mb-4">{item.title}</h2>

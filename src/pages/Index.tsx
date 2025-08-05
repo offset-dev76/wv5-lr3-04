@@ -4,8 +4,7 @@ import TVAppCard from "@/components/TVAppCard";
 import MovieCard from "@/components/MovieCard";
 import WeatherWidget from "@/components/WeatherWidget";
 import WeatherBackground from "@/components/WeatherBackground";
-import NavigationBar from "@/components/NavigationBar";
-import { Clock } from "lucide-react";
+import UnifiedHeader from "@/components/UnifiedHeader";
 import { useKeyboardNavigation } from "@/hooks/useKeyboardNavigation";
 
 // Import images
@@ -86,40 +85,29 @@ const Index = () => {
     movies.length,
     4, // Continue watching count
     3, // Carousel items count
-    4  // Navigation items count (including AI button)
+    5  // Navigation items count (nav + time + weather)
   );
 
-  const getCurrentTime = () => {
-    return new Date().toLocaleTimeString([], {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: true
-    });
-  };
   return <div className="min-h-screen bg-black text-white relative">
       {/* Weather Background Animations */}
       <WeatherBackground condition={weatherCondition} />
       
-      {/* Header with Navigation and Controls */}
-      <header className="flex justify-between items-center p-6 md:p-8">
-        <NavigationBar 
+      {/* Unified Header */}
+      <header>
+        <UnifiedHeader 
           focused={navigation.currentSection === 'nav'}
           focusedIndex={navigation.focusedIndex}
+          onWeatherChange={setWeatherCondition}
         />
-        <div className="flex items-center space-x-6">
-          {/* Time Widget */}
-          <div className="flex items-center text-gray-300">
-            <span className="text-lg font-semibold text-white">{getCurrentTime()}</span>
-          </div>
-          
-          {/* Weather Widget */}
-          <WeatherWidget onWeatherChange={setWeatherCondition} />
-        </div>
       </header>
 
       {/* Hero Carousel Section */}
-      <section id="section-carousel" className="px-6 md:px-8 mb-12">
-        <TVCarousel />
+      <section id="section-carousel" className="relative mb-12">
+        <div className="w-full">
+          <TVCarousel />
+        </div>
+        {/* Fade overlay at bottom */}
+        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black to-transparent pointer-events-none" />
       </section>
       
       {/* Streaming Apps Section */}
