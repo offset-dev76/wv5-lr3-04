@@ -58,7 +58,7 @@ const UnifiedHeader: React.FC<UnifiedHeaderProps> = ({
   const handleNavClick = (path: string) => {
     navigate(path);
   };
-  return <div className="flex justify-center w-full p-6 md:p-8">
+  return <div className="flex justify-center w-full p-6 md:p-8 py-[24px]">
       <div className="bg-black/30 backdrop-blur-md border border-white/10 rounded-full shadow-2xl py-[4px] px-[4px]">
         <div className="flex items-center space-x-2">
           {allItems.map((item, index) => {
